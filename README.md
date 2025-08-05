@@ -1,136 +1,136 @@
-# Tumbex Smart Contract
+# Tumbex Smart Contract v2
 
-**Contract Name:** `tumbex`  
-**Version:** v1  
-**Language:** Clarity (Stacks blockchain)
+A decentralized governance and treasury management contract for the Stacks blockchain, now with advanced delegation, timelock, and veto features.
 
 ---
 
 ## Overview
 
-Tumbex is a decentralized governance and treasury management smart contract for the Stacks blockchain. It enables community-driven proposals, voting, and fund allocation, with robust access control and upgradeability.
+Tumbex v2 enables decentralized communities to propose, vote, and execute funding or governance actions with robust security and flexibility. This upgrade introduces **voting power delegation**, **timelock queues**, and **community veto** mechanisms, making governance more transparent and resistant to abuse.
 
 ---
 
 ## Features
 
-- **Proposals:**  
-  - Submit funding or governance proposals.
-  - Each proposal includes recipient, amount, description, deadline, type, required votes, and proposer.
+### 🗳️ Proposals & Voting
+- **Submit proposals** for funding or governance changes.
+- **Vote** on proposals using your effective voting power (base + delegated).
+- **Quorum and deadlines** enforced for proposal passage.
 
-- **Voting:**  
-  - Users with voting power can vote on proposals.
-  - Prevents double voting and tracks votes per proposal.
+### 👥 Delegation System
+- **Delegate your voting power** to another user.
+- **Revoke delegation** at any time.
+- **Limits** on delegation depth and number of delegations per user to prevent abuse.
+- **Effective voting power** is cached and updated automatically.
 
-- **Execution:**  
-  - Proposals can be executed if they pass quorum and are within the execution window.
-  - Funding proposals transfer funds from the treasury.
-  - Governance proposals are placeholders for future logic.
+### ⏳ Timelock & Veto
+- **Timelock queue**: Passed proposals enter a waiting period before execution.
+- **Review period**: Community can veto proposals during this window.
+- **Veto threshold**: If enough veto power is used, the proposal fails.
 
-- **Administration:**  
-  - Owner and admins can set voting power, add new admins, and pause/unpause the contract.
+### 🏦 Treasury Management
+- **Deposit funds** into the contract treasury.
+- **Funding proposals** can allocate treasury funds if passed and executed.
 
-- **Treasury:**  
-  - Tracks treasury balance.
-  - Funds can be deposited and allocated via proposals.
-
-- **Upgradeability:**  
-  - Owner can update the contract implementation address.
+### 🔒 Administration
+- **Admins** can set voting power, add new admins, and pause/unpause the contract.
+- **Owner** can upgrade the contract implementation address.
 
 ---
 
 ## Data Structures
 
-- **Maps:**
-  - `proposals`: Stores proposal details.
-  - `voted`: Tracks if a user has voted on a proposal.
-  - `voting-power`: Voting power per principal.
-  - `administrators`: Admin status per principal.
-  - `proposal-types`: Human-readable proposal type names.
-
-- **Data Vars:**
-  - `prop-id`: Current proposal ID.
-  - `contract-paused`: Pause status.
-  - `implementation-address`: Address of contract implementation.
-  - `treasury-balance`: Treasury funds.
+- **proposals**: Proposal details (recipient, amount, votes, etc.)
+- **voted**: Tracks who voted on which proposal.
+- **voting-power**: Base voting power per user.
+- **delegations**: Delegation relationships.
+- **delegation-counts**: Number of delegations received.
+- **effective-voting-power**: Cached effective voting power.
+- **timelocks**: Timelock and veto status for proposals.
+- **veto-votes**: Tracks who vetoed a proposal.
+- **administrators**: Admin status.
+- **proposal-types**: Human-readable proposal type names.
 
 ---
 
 ## Key Constants
 
-- `MINIMUM_VOTING_POWER`: Minimum voting power to submit proposals.
-- `MAXIMUM_VOTING_POWER`: Maximum voting power allowed.
-- `PROPOSAL_DURATION`: Voting period (in blocks).
-- `EXECUTION_DELAY`: Execution window after voting ends.
-- `QUORUM_THRESHOLD`: Minimum votes required for proposal to pass.
+- **MINIMUM_VOTING_POWER**: Minimum to submit proposals.
+- **MAXIMUM_VOTING_POWER**: Maximum allowed.
+- **PROPOSAL_DURATION**: Voting period (in blocks).
+- **EXECUTION_DELAY**: Time after voting ends before execution.
+- **QUORUM_THRESHOLD**: Minimum votes for passage.
+- **TIMELOCK_QUEUE_PERIOD**: Timelock queue duration.
+- **TIMELOCK_REVIEW_PERIOD**: Veto review duration.
+- **VETO_THRESHOLD_PERCENTAGE**: % of total voting power needed to veto.
+- **MAX_DELEGATION_DEPTH**: Prevents delegation cycles.
+- **MAX_DELEGATIONS_PER_USER**: Prevents spam.
 
 ---
 
 ## Main Functions
 
 ### Read-Only
-
-- `get-contract-info`: Returns contract name, version, and implementation address.
-- `get-proposal`: Fetches proposal details.
-- `get-voting-power`: Returns user's voting power.
-- `get-treasury-balance`: Returns treasury balance.
-- `is-contract-paused`: Checks if contract is paused.
-- `get-current-proposal-id`: Returns current proposal ID.
-- `has-user-voted`: Checks if user voted on a proposal.
-- `can-execute-proposal`: Checks if proposal can be executed.
-- `get-proposal-status`: Returns proposal status.
+- `get-contract-info`
+- `get-proposal`
+- `get-voting-power`
+- `get-effective-voting-power`
+- `get-delegation`
+- `get-timelock`
+- `get-treasury-balance`
+- `is-contract-paused`
+- `get-current-proposal-id`
+- `has-user-voted`
+- `has-user-vetoed`
+- `can-execute-proposal`
+- `get-proposal-status`
 
 ### Public
-
-- `set-voting-power`: Admin sets voting power for a user.
-- `add-administrator`: Owner adds a new admin.
-- `pause-contract` / `unpause-contract`: Admin pauses/unpauses contract.
-- `submit-proposal`: Submit a new proposal.
-- `vote-on-proposal`: Vote on a proposal.
-- `execute-proposal`: Execute a passed proposal.
-- `deposit-funds`: Add funds to the treasury.
-- `upgrade-implementation`: Owner upgrades contract implementation.
-
----
-
-## Validation & Security
-
-- Strict input validation for all functions.
-- Role-based access control for admin actions.
-- Prevents double voting and unauthorized actions.
-- Proposal execution is strictly controlled by voting and timing rules.
+- `delegate-voting-power`
+- `revoke-delegation`
+- `queue-proposal`
+- `veto-proposal`
+- `set-voting-power`
+- `add-administrator`
+- `pause-contract`
+- `unpause-contract`
+- `submit-proposal`
+- `vote-on-proposal`
+- `execute-proposal`
+- `deposit-funds`
+- `upgrade-implementation`
 
 ---
 
-## Usage
+## Security & Validation
 
-1. **Deposit Funds:**  
-   Use `deposit-funds` to add funds to the treasury.
+- **Strict input validation** and error handling.
+- **Role-based access control** for admin actions.
+- **Cycle detection** in delegation.
+- **Timelock and veto** add extra security to proposal execution.
+- **Double voting and abuse prevention** mechanisms.
 
-2. **Submit Proposal:**  
-   Use `submit-proposal` to create a funding or governance proposal.
+---
+
+## Usage Example
+
+1. **Deposit funds:**  
+   `deposit-funds (amount)`
+
+2. **Submit a proposal:**  
+   `submit-proposal (recipient) (amount) (description) (proposal-type)`
 
 3. **Vote:**  
-   Use `vote-on-proposal` to vote on active proposals.
+   `vote-on-proposal (proposal-id) (vote-amount)`
 
-4. **Execute Proposal:**  
-   Use `execute-proposal` to execute proposals that have passed quorum and are within the execution window.
+4. **Delegate voting power:**  
+   `delegate-voting-power (delegate)`
 
-5. **Admin Actions:**  
-   Owner/admins can set voting power, add admins, pause/unpause, and upgrade the contract.
+5. **Queue and execute proposal:**  
+   `queue-proposal (proposal-id)` → `execute-proposal (proposal-id)`
 
----
-
-## Notes
-
-- **Funding Execution:**  
-  Actual STX transfers are not implemented; treasury balance is updated internally.
-
-- **Governance Execution:**  
-  Placeholder for future governance logic.
-
-- **Upgradeability:**  
-  Owner can set a new implementation address for contract upgrades.
+6. **Veto during review:**  
+   `veto-proposal (proposal-id) (veto-power)`
 
 ---
 
@@ -140,12 +140,6 @@ MIT (or as specified by project)
 
 ---
 
-## Author
-
-[josephine dodo]
-
----
-
 ## Disclaimer
 
-This contract is for educational and demonstration purposes. Review and audit before deploying on mainnet.
+This contract is for demonstration and educational purposes. Review and audit before deploying on mainnet.
